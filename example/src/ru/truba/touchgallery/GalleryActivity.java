@@ -14,7 +14,7 @@ public class GalleryActivity extends Activity {
     private GalleryViewPager mViewPager;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.main);
         String[] urls = {
                 "http://cs407831.userapi.com/v407831207/18f6/jBaVZFDhXRA.jpg",
                 "http://cs407831.userapi.com/v407831207/18fe/4Tz8av5Hlvo.jpg",
@@ -27,9 +27,9 @@ public class GalleryActivity extends Activity {
         Collections.addAll(items, urls);
 
         UrlPagerAdapter pagerAdapter = new UrlPagerAdapter(this, items);
-        mViewPager = new GalleryViewPager(this);
+        mViewPager = (GalleryViewPager)findViewById(R.id.viewer);
+        mViewPager.setOffscreenPageLimit(3);
         mViewPager.setAdapter(pagerAdapter);
-        setContentView(mViewPager);
     }
 
 }
