@@ -3,6 +3,7 @@ package ru.truba.touchgallery.GalleryWidget;
 import android.content.Context;
 import android.graphics.PointF;
 import android.support.v4.view.ViewPager;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import ru.truba.touchgallery.TouchView.TouchImageView;
 
@@ -14,6 +15,9 @@ public class GalleryViewPager extends ViewPager {
     public TouchImageView mCurrentView;
     public GalleryViewPager(Context context) {
         super(context);
+    }
+    public GalleryViewPager(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
     private float[] handleMotionEvent(MotionEvent event)
     {
