@@ -65,6 +65,17 @@ public class TouchImageView extends ImageView {
     long lastPressTime = 0, lastDragTime = 0;
     boolean allowInert = false;
     Context context;
+    
+    // Scale mode on DoubleTap
+    private boolean zoomToOriginalSize = false;
+
+    public boolean isZoomToOriginalSize() {
+        return  this.isZoomToOriginalSize;
+    }
+
+    public void setZoomToOriginalSize(boolean zoomToOriginalSize) {
+        this.zoomToOriginalSize = zoomToOriginalSize;
+    }    
 
     public boolean onLeftSide = false, onTopSide = false, onRightSide = false, onBottomSide = false;
 
@@ -130,8 +141,21 @@ public class TouchImageView extends ImageView {
 
                                 if (saveScale == 1)
                                 {
-                                    matrix.postScale(maxScale / saveScale, maxScale / saveScale, start.x, start.y);
-                                    saveScale = maxScale;
+                                    if (zoomToOriginalSize) {
+                                        // Zoom to original picture size
+                                        float scaleX =  bmWidth / origWidth;
+                                        float scaleY =  bmHeight / origHeight;
+                                        saveScale = Math.min(scaleX, scaleY);
+                                        if (saveScale < minScale) {
+                                            saveScale = minScale;
+                                        } else {
+                                            matrix.postScale(scaleX, scaleY, width / 2, height / 2);
+                                        }
+                                    } else {
+                                        //Zoom to MaxScale (3f by default)
+                                        matrix.postScale(maxScale / saveScale, maxScale / saveScale, start.x, start.y);
+                                        saveScale = maxScale;
+                                    }                                 
                                 }
                                 else
                                 {
