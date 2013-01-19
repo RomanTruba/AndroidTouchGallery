@@ -70,7 +70,7 @@ public class TouchImageView extends ImageView {
     private boolean zoomToOriginalSize = false;
 
     public boolean isZoomToOriginalSize() {
-        return  this.isZoomToOriginalSize;
+        return  this.zoomToOriginalSize;
     }
 
     public void setZoomToOriginalSize(boolean zoomToOriginalSize) {
