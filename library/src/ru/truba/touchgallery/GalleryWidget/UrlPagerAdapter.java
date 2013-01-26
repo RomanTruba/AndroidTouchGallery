@@ -20,10 +20,8 @@ package ru.truba.touchgallery.GalleryWidget;
 import android.content.Context;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Gallery;
 import ru.truba.touchgallery.TouchView.UrlTouchImageView;
 
 import java.util.List;
@@ -51,6 +49,7 @@ public class UrlPagerAdapter extends PagerAdapter {
         final UrlTouchImageView iv = new UrlTouchImageView(mContext);
         iv.setUrl(mResources.get(position));
         iv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        
         collection.addView(iv, 0);
         return iv;
     }
