@@ -33,8 +33,8 @@ import java.util.List;
  */
 public class UrlPagerAdapter extends PagerAdapter {
 
-    private List<String> mResources;
-    private Context mContext;
+    private final List<String> mResources;
+    private final Context mContext;
     public UrlPagerAdapter(Context context, List<String> resources){
         this.mResources = resources;
         this.mContext = context;
@@ -47,18 +47,17 @@ public class UrlPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public Object instantiateItem(View collection, int position){
-        UrlTouchImageView iv = new UrlTouchImageView(mContext);
+    public Object instantiateItem(ViewGroup collection, int position){
+        final UrlTouchImageView iv = new UrlTouchImageView(mContext);
         iv.setUrl(mResources.get(position));
-        iv.setLayoutParams(new Gallery.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
-
-        ((ViewPager) collection).addView(iv, 0);
+        iv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        collection.addView(iv, 0);
         return iv;
     }
 
     @Override
-    public void destroyItem(View collection, int position, Object view){
-        ((ViewPager) collection).removeView((View) view);
+    public void destroyItem(ViewGroup collection, int position, Object view){
+        collection.removeView((View) view);
     }
 
     @Override
@@ -72,7 +71,7 @@ public class UrlPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public void finishUpdate(View arg0){
+    public void finishUpdate(ViewGroup arg0){
     }
 
     @Override
@@ -85,7 +84,7 @@ public class UrlPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public void startUpdate(View arg0){
+    public void startUpdate(ViewGroup arg0){
     }
 
 }
