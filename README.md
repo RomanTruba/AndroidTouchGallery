@@ -7,13 +7,15 @@ Widget allows use it in Android > 2.0!
 
 How to use
 ===================
-1. Download and install "Android support" package. Look here for some instructions: http://android-developers.blogspot.com/2011/08/horizontal-view-swiping-with-viewpager.html
-2. Add files to your project and then use it in layout or programmatically
-3. You can see example for better understanding
+1. Make import of library folder in your IDE.
+2. Make sure, that AndroidTouchGallery has included as library. Check project properties, and make sure checkbox "Is library" is checked.
+3. Include GalleryViewPager in your layout xml or programmatically.
+4. Provide one of library adapters: UrlPagerAdapter or FilePagerAdapter
+5. You can always check example if you miss something.
 
 License
 ===================
-Copyright (c) 2012 Roman Truba
+Copyright (c) 2012-2013 Roman Truba
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  documentation files (the "Software"), to deal in the Software without restriction, including without limitation
