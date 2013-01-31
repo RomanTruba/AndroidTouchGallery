@@ -17,20 +17,30 @@
  */
 package ru.truba.touchgallery.TouchView;
 
+import java.lang.ref.WeakReference;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.ImageView;
 
+@SuppressLint("NewApi")
 public class TouchImageView extends ImageView {
 
-    private static final String TAG = "Touch";
+//    private static final String TAG = "Touch";
     // These matrices will be used to move and zoom image
     Matrix matrix = new Matrix();
     Matrix savedMatrix = new Matrix();
@@ -64,7 +74,12 @@ public class TouchImageView extends ImageView {
 
     long lastPressTime = 0, lastDragTime = 0;
     boolean allowInert = false;
-    Context context;
+    
+    private Context mContext;
+    private Timer mClickTimer;
+    private OnClickListener mOnClickListener;
+    private Object mScaleDetector;
+    private Handler mTimerHandler = null;
     
     // Scale mode on DoubleTap
     private boolean zoomToOriginalSize = false;
@@ -82,7 +97,7 @@ public class TouchImageView extends ImageView {
     public TouchImageView(Context context) {
         super(context);
         super.setClickable(true);
-        this.context = context;
+        this.mContext = context;
 
         init();
     }
@@ -90,21 +105,30 @@ public class TouchImageView extends ImageView {
     {
         super(context, attrs);
         super.setClickable(true);
-        this.context = context;
+        this.mContext = context;
 
         init();
     }
-    protected void init()
+    
+	protected void init()
     {
+		mTimerHandler = new TimeHandler(this);
         matrix.setTranslate(1f, 1f);
         m = new float[9];
         setImageMatrix(matrix);
         setScaleType(ScaleType.MATRIX);
+        if (Build.VERSION.SDK_INT >= 8)
+        {
+            mScaleDetector = new ScaleGestureDetector(mContext, new ScaleListener());
+        }
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent rawEvent) {
                 WrapMotionEvent event = WrapMotionEvent.wrap(rawEvent);
-
+                if (mScaleDetector != null)
+                {
+                     ((ScaleGestureDetector)mScaleDetector).onTouchEvent(rawEvent);
+                }
                 fillMatrixXY();
                 PointF curr = new PointF(event.getX(), event.getY());
 
@@ -134,28 +158,17 @@ public class TouchImageView extends ImageView {
                         int yDiff = (int) Math.abs(event.getY() - start.y);
 
                         if (xDiff < CLICK && yDiff < CLICK) {
-                            performClick();
+
+
                             //Perform scale on double click
                             long pressTime = System.currentTimeMillis();
                             if (pressTime - lastPressTime <= DOUBLE_PRESS_INTERVAL) {
-
+                                if (mClickTimer != null) mClickTimer.cancel();
                                 if (saveScale == 1)
                                 {
-                                    if (zoomToOriginalSize) {
-                                        // Zoom to original picture size
-                                        float scaleX =  bmWidth / origWidth;
-                                        float scaleY =  bmHeight / origHeight;
-                                        saveScale = Math.min(scaleX, scaleY);
-                                        if (saveScale < minScale) {
-                                            saveScale = minScale;
-                                        } else {
-                                            matrix.postScale(scaleX, scaleY, width / 2, height / 2);
-                                        }
-                                    } else {
-                                        //Zoom to MaxScale (3f by default)
-                                        matrix.postScale(maxScale / saveScale, maxScale / saveScale, start.x, start.y);
-                                        saveScale = maxScale;
-                                    }                                 
+                                    final float targetScale = maxScale / saveScale;
+                                    matrix.postScale(targetScale, targetScale, start.x, start.y);
+                                    saveScale = maxScale;
                                 }
                                 else
                                 {
@@ -168,6 +181,8 @@ public class TouchImageView extends ImageView {
                             }
                             else {
                                 lastPressTime = pressTime;
+                                mClickTimer = new Timer();
+                                mClickTimer.schedule(new Task(), 300);
                             }
                             if (saveScale == minScale) {
                                 scaleMatrixToBounds();
@@ -199,7 +214,7 @@ public class TouchImageView extends ImageView {
                             lastDelta.set(deltaX, deltaY);
                             last.set(curr.x, curr.y);
                         }
-                        else if (mode == ZOOM) {
+                        else if (mScaleDetector == null && mode == ZOOM) {
                             float newDist = spacing(event);
                             if (rawEvent.getPointerCount() < 2) break;
                             //There is one serious trouble: when you scaling with two fingers, then pick up first finger of gesture, ACTION_MOVE being called.
@@ -253,9 +268,23 @@ public class TouchImageView extends ImageView {
             }
         });
     }
+    public void resetScale()
+    {
+        fillMatrixXY();
+        matrix.postScale(minScale / saveScale, minScale / saveScale, width / 2, height / 2);
+        saveScale = minScale;
 
+        calcPadding();
+        checkAndSetTranslate(0, 0);
+
+        scaleMatrixToBounds();
+
+        setImageMatrix(matrix);
+        invalidate();
+    }
     public boolean pagerCanScroll()
     {
+        if (mode != NONE) return false;
         return saveScale == minScale;
     }
 
@@ -291,7 +320,8 @@ public class TouchImageView extends ImageView {
                 deltaX = -matrixX;
             else if (matrixX + deltaX < -right)
                 deltaX = -(matrixX + right);
-        } else {
+        }
+        else {
             if (matrixX + deltaX > 0)
                 deltaX = -matrixX;
             else if (matrixX + deltaX < -right)
@@ -313,9 +343,11 @@ public class TouchImageView extends ImageView {
         float scaleHeight = Math.round(origHeight * saveScale);
         onLeftSide = onRightSide = onTopSide = onBottomSide = false;
         if (-matrixX < 10.0f ) onLeftSide = true;
-        else if (Math.abs(-matrixX + width - scaleWidth) < 10.0f) onRightSide = true;
+        //Log.d("GalleryViewPager", String.format("ScaleW: %f; W: %f, MatrixX: %f", scaleWidth, width, matrixX));
+        if ((scaleWidth >= width && (matrixX + scaleWidth - width) < 10) ||
+            (scaleWidth <= width && -matrixX + scaleWidth <= width)) onRightSide = true;
         if (-matrixY < 10.0f) onTopSide = true;
-        else if (Math.abs(-matrixY + height - scaleHeight) < 10.0f) onBottomSide = true;
+        if (Math.abs(-matrixY + height - scaleHeight) < 10.0f) onBottomSide = true;
     }
     private void calcPadding()
     {
@@ -396,4 +428,92 @@ public class TouchImageView extends ImageView {
         float y = event.getY(0) + event.getY(1);
         return new PointF(x / 2, y / 2);
     }
+
+    @Override
+    public void setOnClickListener(OnClickListener l) {
+        mOnClickListener = l;
+    }
+
+    
+    private class Task extends TimerTask {
+        public void run() {
+            mTimerHandler.sendEmptyMessage(0);
+        }
+    }
+
+	private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            mode = ZOOM;
+            return true;
+        }
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            float mScaleFactor = (float)Math.min(Math.max(.95f, detector.getScaleFactor()), 1.05);
+            float origScale = saveScale;
+            saveScale *= mScaleFactor;
+            if (saveScale > maxScale) {
+                saveScale = maxScale;
+                mScaleFactor = maxScale / origScale;
+            } else if (saveScale < minScale) {
+                saveScale = minScale;
+                mScaleFactor = minScale / origScale;
+            }
+            right = width * saveScale - width - (2 * redundantXSpace * saveScale);
+            bottom = height * saveScale - height - (2 * redundantYSpace * saveScale);
+            if (origWidth * saveScale <= width || origHeight * saveScale <= height) {
+                matrix.postScale(mScaleFactor, mScaleFactor, width / 2, height / 2);
+                if (mScaleFactor < 1) {
+                    matrix.getValues(m);
+                    float x = m[Matrix.MTRANS_X];
+                    float y = m[Matrix.MTRANS_Y];
+                    if (mScaleFactor < 1) {
+                        if (Math.round(origWidth * saveScale) < width) {
+                            if (y < -bottom)
+                                matrix.postTranslate(0, -(y + bottom));
+                            else if (y > 0)
+                                matrix.postTranslate(0, -y);
+                        } else {
+                            if (x < -right)
+                                matrix.postTranslate(-(x + right), 0);
+                            else if (x > 0)
+                                matrix.postTranslate(-x, 0);
+                        }
+                    }
+                }
+            } else {
+                matrix.postScale(mScaleFactor, mScaleFactor, detector.getFocusX(), detector.getFocusY());
+                matrix.getValues(m);
+                float x = m[Matrix.MTRANS_X];
+                float y = m[Matrix.MTRANS_Y];
+                if (mScaleFactor < 1) {
+                    if (x < -right)
+                        matrix.postTranslate(-(x + right), 0);
+                    else if (x > 0)
+                        matrix.postTranslate(-x, 0);
+                    if (y < -bottom)
+                        matrix.postTranslate(0, -(y + bottom));
+                    else if (y > 0)
+                        matrix.postTranslate(0, -y);
+                }
+            }
+            return true;
+
+        }
+    }
+	static class TimeHandler extends Handler {
+	    private final WeakReference<TouchImageView> mService; 
+
+	    TimeHandler(TouchImageView view) {
+	        mService = new WeakReference<TouchImageView>(view);
+	        
+	    }
+	    @Override
+	    public void handleMessage(Message msg)
+	    {
+	    	mService.get().performClick();
+            if (mService.get().mOnClickListener != null) mService.get().mOnClickListener.onClick(mService.get());
+	    }
+	}
 }

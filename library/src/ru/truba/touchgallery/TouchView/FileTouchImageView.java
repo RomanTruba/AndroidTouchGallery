@@ -26,24 +26,22 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.FileInputStream;
 
-public class UrlTouchImageView extends RelativeLayout {
+public class FileTouchImageView extends RelativeLayout {
     protected ProgressBar mProgressBar;
     protected TouchImageView mImageView;
 
     protected Context mContext;
 
-    public UrlTouchImageView(Context ctx)
+    public FileTouchImageView(Context ctx)
     {
         super(ctx);
         mContext = ctx;
         init();
 
     }
-    public UrlTouchImageView(Context ctx, AttributeSet attrs)
+    public FileTouchImageView(Context ctx, AttributeSet attrs)
     {
         super(ctx, attrs);
         mContext = ctx;
@@ -59,7 +57,7 @@ public class UrlTouchImageView extends RelativeLayout {
         this.addView(mImageView);
         mImageView.setVisibility(GONE);
 
-        mProgressBar = new ProgressBar(mContext, null, android.R.attr.progressBarStyleHorizontal);
+        mProgressBar = new ProgressBar(mContext, null, android.R.attr.progressBarStyleSmall);
         params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.CENTER_VERTICAL);
         params.setMargins(30, 0, 30, 0);
@@ -68,27 +66,22 @@ public class UrlTouchImageView extends RelativeLayout {
         this.addView(mProgressBar);
     }
 
-    public void setUrl(String imageUrl)
+    public void setUrl(String imagePath)
     {
-        new ImageLoadTask().execute(imageUrl);
+        new ImageLoadTask().execute(imagePath);
     }
     //No caching load
     public class ImageLoadTask extends AsyncTask<String, Integer, Bitmap>
     {
         @Override
         protected Bitmap doInBackground(String... strings) {
-            String url = strings[0];
+            String path = strings[0];
             Bitmap bm = null;
             try {
-                URL aURL = new URL(url);
-                URLConnection conn = aURL.openConnection();
-                conn.connect();
-                InputStream is = conn.getInputStream();
-                BufferedInputStream bis = new BufferedInputStream(is, 8192);
                 
+                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(path), 8192);
                 bm = BitmapFactory.decodeStream(bis);
                 bis.close();
-                is.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
