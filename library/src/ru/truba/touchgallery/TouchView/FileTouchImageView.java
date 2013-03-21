@@ -20,15 +20,14 @@ package ru.truba.touchgallery.TouchView;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-
-import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 
-public class FileTouchImageView extends RelativeLayout {
+import ru.truba.touchgallery.TouchView.InputStreamWrapper.InputStreamProgressListener;
+
+public class FileTouchImageView extends UrlTouchImageView {
     protected ProgressBar mProgressBar;
     protected TouchImageView mImageView;
 
@@ -47,52 +46,37 @@ public class FileTouchImageView extends RelativeLayout {
         mContext = ctx;
         init();
     }
-    public TouchImageView getImageView() { return mImageView; }
-
-    @SuppressWarnings("deprecation")
-    protected void init() {
-        mImageView = new TouchImageView(mContext);
-        LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-        mImageView.setLayoutParams(params);
-        this.addView(mImageView);
-        mImageView.setVisibility(GONE);
-
-        mProgressBar = new ProgressBar(mContext, null, android.R.attr.progressBarStyleSmall);
-        params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.CENTER_VERTICAL);
-        params.setMargins(30, 0, 30, 0);
-        mProgressBar.setLayoutParams(params);
-        mProgressBar.setIndeterminate(true);
-        this.addView(mProgressBar);
-    }
 
     public void setUrl(String imagePath)
     {
         new ImageLoadTask().execute(imagePath);
     }
     //No caching load
-    public class ImageLoadTask extends AsyncTask<String, Integer, Bitmap>
+    public class ImageLoadTask extends UrlTouchImageView.ImageLoadTask
     {
         @Override
         protected Bitmap doInBackground(String... strings) {
             String path = strings[0];
             Bitmap bm = null;
             try {
-                
-                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(path), 8192);
+            	File file = new File(path);
+            	FileInputStream fis = new FileInputStream(file);
+                InputStreamWrapper bis = new InputStreamWrapper(fis, 8192, file.length());
+                bis.setProgressListener(new InputStreamProgressListener()
+				{					
+					@Override
+					public void onProgress(float progressValue, long bytesLoaded,
+							long bytesTotal)
+					{
+						publishProgress((int)(progressValue * 100));
+					}
+				});
                 bm = BitmapFactory.decodeStream(bis);
                 bis.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
             return bm;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            mImageView.setImageBitmap(bitmap);
-            mImageView.setVisibility(VISIBLE);
-            mProgressBar.setVisibility(GONE);
         }
     }
 }

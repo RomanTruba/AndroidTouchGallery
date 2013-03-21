@@ -22,13 +22,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
+import android.widget.ImageView.ScaleType;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+
+import ru.truba.touchgallery.R;
+import ru.truba.touchgallery.TouchView.InputStreamWrapper.InputStreamProgressListener;
 
 public class UrlTouchImageView extends RelativeLayout {
     protected ProgressBar mProgressBar;
@@ -64,7 +67,8 @@ public class UrlTouchImageView extends RelativeLayout {
         params.addRule(RelativeLayout.CENTER_VERTICAL);
         params.setMargins(30, 0, 30, 0);
         mProgressBar.setLayoutParams(params);
-        mProgressBar.setIndeterminate(true);
+        mProgressBar.setIndeterminate(false);
+        mProgressBar.setMax(100);
         this.addView(mProgressBar);
     }
 
@@ -84,8 +88,17 @@ public class UrlTouchImageView extends RelativeLayout {
                 URLConnection conn = aURL.openConnection();
                 conn.connect();
                 InputStream is = conn.getInputStream();
-                BufferedInputStream bis = new BufferedInputStream(is, 8192);
-                
+                int totalLen = conn.getContentLength();
+                InputStreamWrapper bis = new InputStreamWrapper(is, 8192, totalLen);
+                bis.setProgressListener(new InputStreamProgressListener()
+				{					
+					@Override
+					public void onProgress(float progressValue, long bytesLoaded,
+							long bytesTotal)
+					{
+						publishProgress((int)(progressValue * 100));
+					}
+				});
                 bm = BitmapFactory.decodeStream(bis);
                 bis.close();
                 is.close();
@@ -94,12 +107,28 @@ public class UrlTouchImageView extends RelativeLayout {
             }
             return bm;
         }
-
+        
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            mImageView.setImageBitmap(bitmap);
+        	if (bitmap == null) 
+        	{
+        		mImageView.setScaleType(ScaleType.CENTER);
+        		bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_photo);
+        		mImageView.setImageBitmap(bitmap);
+        	}
+        	else 
+        	{
+        		mImageView.setScaleType(ScaleType.MATRIX);
+	            mImageView.setImageBitmap(bitmap);
+        	}
             mImageView.setVisibility(VISIBLE);
             mProgressBar.setVisibility(GONE);
         }
+
+		@Override
+		protected void onProgressUpdate(Integer... values)
+		{
+			mProgressBar.setProgress(values[0]);
+		}
     }
 }

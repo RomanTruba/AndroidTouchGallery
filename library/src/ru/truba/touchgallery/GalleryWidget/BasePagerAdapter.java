@@ -25,8 +25,6 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import ru.truba.touchgallery.TouchView.UrlTouchImageView;
-
 /**
  Class wraps URLs to adapter, then it instantiates <b>UrlTouchImageView</b> objects to paging up through them.
  */

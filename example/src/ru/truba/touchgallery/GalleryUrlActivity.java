@@ -34,7 +34,7 @@ public class GalleryUrlActivity extends Activity {
         setContentView(R.layout.main);
         String[] urls = {
                 "http://cs407831.userapi.com/v407831207/18f6/jBaVZFDhXRA.jpg",
-                "http://cs407831.userapi.com/v407831207/18fe/4Tz8av5Hlvo.jpg",
+                "http://cs407831.userapi.com/v4078f31207/18fe/4Tz8av5Hlvo.jpg",
                 "http://cs407831.userapi.com/v407831207/1906/oxoP6URjFtA.jpg",
                 "http://cs407831.userapi.com/v407831207/190e/2Sz9A774hUc.jpg",
                 "http://cs407831.userapi.com/v407831207/1916/Ua52RjnKqjk.jpg",
