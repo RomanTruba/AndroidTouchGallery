@@ -30,6 +30,12 @@ local.properties
 
 
 #################
+## IntelliJ IDEA
+#################
+
+*.iml
+
+#################
 ## Visual Studio
 #################
 
@@ -175,4 +181,5 @@ example/src/ru/truba/touchgallery/TouchView
 
 bin/
 gen/
+target/
 
