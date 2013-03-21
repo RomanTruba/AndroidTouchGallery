@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru.truba.touchgallery" >
+    package="ru.truba.touchgallery"
+    android:versionCode="2"
+    android:versionName="1.2"
+    android:installLocation="auto" >
 
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="17" />
 
@@ -9,6 +12,7 @@
     <application
         android:icon="@drawable/icon"
         android:label="@string/app_name"
+        
         android:allowBackup="false" >
         <activity
             android:name="ru.truba.touchgallery.GalleryUrlActivity"
@@ -19,8 +23,7 @@
             android:configChanges="orientation" >
         </activity>
         <activity
-            android:name="ru.truba.touchgallery.MainActivity"
-            android:label="@string/title_activity_main" >
+            android:name="ru.truba.touchgallery.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
