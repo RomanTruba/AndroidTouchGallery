@@ -7,7 +7,7 @@
          
     <modelVersion>4.0.0</modelVersion>
     <name>AndroidTouchGallery</name>
-    <groupId>net.goblindegook.AndroidTouchGallery</groupId>
+    <groupId>ru.truba.AndroidTouchGallery</groupId>
     <artifactId>touchgallery</artifactId>
     <version>1.1</version>
     <packaging>apklib</packaging>
