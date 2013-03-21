@@ -6,10 +6,15 @@
                         http://maven.apache.org/maven-v4_0_0.xsd">
          
     <modelVersion>4.0.0</modelVersion>
+    <name>AndroidTouchGallery</name>
     <groupId>net.goblindegook.AndroidTouchGallery</groupId>
     <artifactId>touchgallery</artifactId>
     <version>1.1</version>
     <packaging>apklib</packaging>
+
+    <scm>
+        <url>https://github.com/goblindegook/AndroidTouchGallery</url>
+    </scm>
 
     <properties>
         <platform.version>4.1.1.4</platform.version>
