@@ -19,6 +19,8 @@ package ru.truba.touchgallery;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.Toast;
+import ru.truba.touchgallery.GalleryWidget.BasePagerAdapter.OnItemChangeListener;
 import ru.truba.touchgallery.GalleryWidget.GalleryViewPager;
 import ru.truba.touchgallery.GalleryWidget.UrlPagerAdapter;
 
@@ -44,9 +46,19 @@ public class GalleryUrlActivity extends Activity {
         Collections.addAll(items, urls);
 
         UrlPagerAdapter pagerAdapter = new UrlPagerAdapter(this, items);
+        pagerAdapter.setOnItemChangeListener(new OnItemChangeListener()
+		{
+			@Override
+			public void onItemChange(int currentPosition)
+			{
+				Toast.makeText(GalleryUrlActivity.this, "Current item is " + currentPosition, Toast.LENGTH_SHORT).show();
+			}
+		});
+        
         mViewPager = (GalleryViewPager)findViewById(R.id.viewer);
         mViewPager.setOffscreenPageLimit(3);
         mViewPager.setAdapter(pagerAdapter);
+        
     }
 
 }

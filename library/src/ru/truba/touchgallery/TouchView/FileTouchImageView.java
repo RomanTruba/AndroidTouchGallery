@@ -21,30 +21,22 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
-import android.widget.ProgressBar;
 import java.io.File;
 import java.io.FileInputStream;
 
 import ru.truba.touchgallery.TouchView.InputStreamWrapper.InputStreamProgressListener;
 
-public class FileTouchImageView extends UrlTouchImageView {
-    protected ProgressBar mProgressBar;
-    protected TouchImageView mImageView;
-
-    protected Context mContext;
-
+public class FileTouchImageView extends UrlTouchImageView 
+{
+	
     public FileTouchImageView(Context ctx)
     {
         super(ctx);
-        mContext = ctx;
-        init();
 
     }
     public FileTouchImageView(Context ctx, AttributeSet attrs)
     {
         super(ctx, attrs);
-        mContext = ctx;
-        init();
     }
 
     public void setUrl(String imagePath)

@@ -19,8 +19,10 @@ package ru.truba.touchgallery;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.Toast;
 import ru.truba.touchgallery.GalleryWidget.FilePagerAdapter;
 import ru.truba.touchgallery.GalleryWidget.GalleryViewPager;
+import ru.truba.touchgallery.GalleryWidget.BasePagerAdapter.OnItemChangeListener;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,6 +58,15 @@ public class GalleryFileActivity extends Activity {
 		}
 
         FilePagerAdapter pagerAdapter = new FilePagerAdapter(this, items);
+        pagerAdapter.setOnItemChangeListener(new OnItemChangeListener()
+		{
+			@Override
+			public void onItemChange(int currentPosition)
+			{
+				Toast.makeText(GalleryFileActivity.this, "Current item is " + currentPosition, Toast.LENGTH_SHORT).show();
+			}
+		});
+        
         mViewPager = (GalleryViewPager)findViewById(R.id.viewer);
         mViewPager.setOffscreenPageLimit(3);
         mViewPager.setAdapter(pagerAdapter);
