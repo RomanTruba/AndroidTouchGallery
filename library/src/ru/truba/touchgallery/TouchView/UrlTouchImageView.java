@@ -136,4 +136,8 @@ public class UrlTouchImageView extends RelativeLayout {
 			mProgressBar.setProgress(values[0]);
 		}
     }
+
+    public void setScaleType(ScaleType scaleType) {
+        mImageView.setScaleType(scaleType);
+    }
 }

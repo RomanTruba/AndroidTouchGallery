@@ -20,6 +20,7 @@ package ru.truba.touchgallery.GalleryWidget;
 import java.util.List;
 
 import android.content.Context;
+import android.view.View;
 import android.view.ViewGroup;
 import ru.truba.touchgallery.TouchView.UrlTouchImageView;
 
@@ -28,11 +29,19 @@ import ru.truba.touchgallery.TouchView.UrlTouchImageView;
  Class wraps URLs to adapter, then it instantiates {@link UrlTouchImageView} objects to paging up through them.
  */
 public class UrlPagerAdapter extends BasePagerAdapter {
-	
+
+    private OnItemClickListener mListener = null;
+
 	public UrlPagerAdapter(Context context, List<String> resources)
 	{
 		super(context, resources);
 	}
+
+    public UrlPagerAdapter(Context context, List<String> resources, OnItemClickListener listener) {
+        super(context, resources);
+        mListener = listener;
+    }
+
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
         super.setPrimaryItem(container, position, object);
@@ -40,11 +49,20 @@ public class UrlPagerAdapter extends BasePagerAdapter {
     }
 
     @Override
-    public Object instantiateItem(ViewGroup collection, int position){
+    public Object instantiateItem(ViewGroup collection, final int position){
         final UrlTouchImageView iv = new UrlTouchImageView(mContext);
         iv.setUrl(mResources.get(position));
         iv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        
+
+        if(mListener != null) {
+            iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onItemChange(view, position);
+                }
+            });
+        }
+
         collection.addView(iv, 0);
         return iv;
     }

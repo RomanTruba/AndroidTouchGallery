@@ -34,16 +34,20 @@ public class BasePagerAdapter extends PagerAdapter {
     protected final Context mContext;
     protected int mCurrentPosition = -1;
     protected OnItemChangeListener mOnItemChangeListener;
+    public OnItemClickListener mOnItemClickListener;
+
     public BasePagerAdapter()
     {
         mResources = null;
         mContext = null;
     }
+
     public BasePagerAdapter(Context context, List<String> resources)
     {
         this.mResources = resources;
         this.mContext = context;
     }
+
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
         super.setPrimaryItem(container, position, object);
@@ -95,4 +99,10 @@ public class BasePagerAdapter extends PagerAdapter {
     {
     	public void onItemChange(int currentPosition);
     }
+
+    public static interface OnItemClickListener {
+        public void onItemChange(View view, int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) { mOnItemClickListener = listener; }
 }
