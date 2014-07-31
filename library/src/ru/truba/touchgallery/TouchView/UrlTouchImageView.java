@@ -76,6 +76,11 @@ public class UrlTouchImageView extends RelativeLayout {
     {
         new ImageLoadTask().execute(imageUrl);
     }
+    
+    public void setScaleType(ScaleType scaleType) {
+        mImageView.setScaleType(scaleType);
+    }
+    
     //No caching load
     public class ImageLoadTask extends AsyncTask<String, Integer, Bitmap>
     {
