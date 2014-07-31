@@ -36,6 +36,7 @@ public class GalleryViewPager extends ViewPager {
     public GalleryViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
+
     private float[] handleMotionEvent(MotionEvent event)
     {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {

@@ -18,6 +18,7 @@
 package ru.truba.touchgallery.GalleryWidget;
 
 import android.content.Context;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -37,8 +38,16 @@ public class InfinityFilePagerAdapter extends BasePagerAdapter {
     public int FIRST_PAGE = 1;
 
     private ImageView.ScaleType mScaleType = null;
+    private OnItemClickListener mListener = null;
 
-	public InfinityFilePagerAdapter(Context context, List<String> resources) {
+    public InfinityFilePagerAdapter(Context context, List<String> resources, OnItemClickListener listener) {
+        super(context, resources);
+        TOTAL_PAGES = resources.size();
+        FIRST_PAGE = TOTAL_PAGES * MIN_LOOPS / 2;
+        mListener = listener;
+    }
+
+    public InfinityFilePagerAdapter(Context context, List<String> resources) {
 		super(context, resources);
         TOTAL_PAGES = resources.size();
         FIRST_PAGE = TOTAL_PAGES * MIN_LOOPS / 2;
@@ -58,6 +67,17 @@ public class InfinityFilePagerAdapter extends BasePagerAdapter {
 
         iv.setUrl(mResources.get(position));
         iv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        final int _positionForOnClick = position;
+
+        if(mListener != null) {
+            iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onItemChange(view, _positionForOnClick);
+                }
+            });
+        }
 
         if(mScaleType != null)
             iv.setScaleType(mScaleType);
