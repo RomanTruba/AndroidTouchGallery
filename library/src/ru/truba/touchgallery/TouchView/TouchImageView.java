@@ -40,7 +40,9 @@ import android.widget.ImageView;
 @SuppressLint("NewApi")
 public class TouchImageView extends ImageView {
 
-//    private static final String TAG = "Touch";
+    private int positionForTouchImageView = -1;
+
+    // private static final String TAG = "Touch";
     // These matrices will be used to move and zoom image
     Matrix matrix = new Matrix();
     Matrix savedMatrix = new Matrix();
@@ -516,4 +518,20 @@ public class TouchImageView extends ImageView {
             if (mService.get().mOnClickListener != null) mService.get().mOnClickListener.onClick(mService.get());
 	    }
 	}
+
+    /**
+     * Set position for element
+     * @param positionForTouchImageView
+     */
+    public void setPositionForTouchImageView(int positionForTouchImageView) {
+        this.positionForTouchImageView = positionForTouchImageView;
+    }
+
+    /**
+     * Get position for element
+     * @return
+     */
+    public int getPositionForTouchImageView() {
+        return positionForTouchImageView;
+    }
 }

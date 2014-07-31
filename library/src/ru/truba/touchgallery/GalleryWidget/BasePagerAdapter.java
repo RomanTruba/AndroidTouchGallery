@@ -34,7 +34,6 @@ public class BasePagerAdapter extends PagerAdapter {
     protected final Context mContext;
     protected int mCurrentPosition = -1;
     protected OnItemChangeListener mOnItemChangeListener;
-    public OnItemClickListener mOnItemClickListener;
 
     public BasePagerAdapter()
     {
@@ -49,12 +48,14 @@ public class BasePagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+    public void setPrimaryItem(ViewGroup container, final int position, Object object) {
         super.setPrimaryItem(container, position, object);
         if (mCurrentPosition == position) return;
         GalleryViewPager galleryContainer = ((GalleryViewPager)container);
-        if (galleryContainer.mCurrentView != null) galleryContainer.mCurrentView.resetScale();
-        
+        if (galleryContainer.mCurrentView != null) {
+            galleryContainer.mCurrentView.setPositionForTouchImageView(position);
+            galleryContainer.mCurrentView.resetScale();
+        }
         mCurrentPosition = position;
         if (mOnItemChangeListener != null) mOnItemChangeListener.onItemChange(mCurrentPosition);
     }
@@ -99,10 +100,4 @@ public class BasePagerAdapter extends PagerAdapter {
     {
     	public void onItemChange(int currentPosition);
     }
-
-    public static interface OnItemClickListener {
-        public void onItemChange(View view, int position);
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) { mOnItemClickListener = listener; }
-}
+};

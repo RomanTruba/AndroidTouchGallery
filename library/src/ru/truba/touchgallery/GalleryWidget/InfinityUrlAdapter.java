@@ -20,14 +20,6 @@ public class InfinityUrlAdapter extends BasePagerAdapter {
     // more than 1000 times just in order to test your "infinite" ViewPager :D
     public int FIRST_PAGE = 1;
     private ImageView.ScaleType mScaleType = null;
-    private OnItemClickListener mListener = null;
-
-    public InfinityUrlAdapter(Context context, List<String> resources, OnItemClickListener listener) {
-        super(context, resources);
-        TOTAL_PAGES = resources.size();
-        FIRST_PAGE = TOTAL_PAGES * MIN_LOOPS / 2;
-        mListener = listener;
-    }
 
     public InfinityUrlAdapter(Context context, List<String> resources) {
         super(context, resources);
@@ -46,17 +38,7 @@ public class InfinityUrlAdapter extends BasePagerAdapter {
     public Object instantiateItem(ViewGroup collection, int position) {
 
         position = position % TOTAL_PAGES;
-        final int _positionForOnClick = position;
-
         final UrlTouchImageView iv = new UrlTouchImageView(mContext);
-        if(mListener != null) {
-            iv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mListener.onItemChange(view, _positionForOnClick);
-                }
-            });
-        }
         iv.setUrl(mResources.get(position));
         iv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         if(mScaleType != null)
