@@ -17,8 +17,10 @@
  */
 package ru.truba.touchgallery.GalleryWidget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PointF;
+import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -46,6 +48,7 @@ public class GalleryViewPager extends ViewPager {
         super(context, attrs);
     }
 
+    @TargetApi(Build.VERSION_CODES.ECLAIR)
     private float[] handleMotionEvent(MotionEvent event) {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
@@ -69,7 +72,7 @@ public class GalleryViewPager extends ViewPager {
             float endY = event.getY();
             if(isAClick(startX, endX, startY, endY)) {
                 if(mOnItemClickListener != null) {
-                    mOnItemClickListener.onItemClicked(mCurrentView, mCurrentView.getPositionForTouchImageView());
+                    mOnItemClickListener.onItemClicked(mCurrentView, getCurrentItem());
                 }
                 //launchFullPhotoActivity(imageUrls);// WE HAVE A CLICK!!
             } else {
@@ -122,9 +125,8 @@ public class GalleryViewPager extends ViewPager {
             float endY = event.getY();
             if(isAClick(startX, endX, startY, endY)) {
                 if(mOnItemClickListener != null) {
-                    mOnItemClickListener.onItemClicked(mCurrentView, mCurrentView.getPositionForTouchImageView());
+                    mOnItemClickListener.onItemClicked(mCurrentView, getCurrentItem());
                 }
-                //launchFullPhotoActivity(imageUrls);// WE HAVE A CLICK!!
             } else {
                 super.onInterceptTouchEvent(event);
             }

@@ -53,7 +53,6 @@ public class BasePagerAdapter extends PagerAdapter {
         if (mCurrentPosition == position) return;
         GalleryViewPager galleryContainer = ((GalleryViewPager)container);
         if (galleryContainer.mCurrentView != null) {
-            galleryContainer.mCurrentView.setPositionForTouchImageView(position);
             galleryContainer.mCurrentView.resetScale();
         }
         mCurrentPosition = position;

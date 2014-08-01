@@ -518,20 +518,4 @@ public class TouchImageView extends ImageView {
             if (mService.get().mOnClickListener != null) mService.get().mOnClickListener.onClick(mService.get());
 	    }
 	}
-
-    /**
-     * Set position for element
-     * @param positionForTouchImageView
-     */
-    public void setPositionForTouchImageView(int positionForTouchImageView) {
-        this.positionForTouchImageView = positionForTouchImageView;
-    }
-
-    /**
-     * Get position for element
-     * @return
-     */
-    public int getPositionForTouchImageView() {
-        return positionForTouchImageView;
-    }
-}
+};
