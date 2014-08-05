@@ -17,19 +17,30 @@
  */
 package ru.truba.touchgallery.GalleryWidget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PointF;
+import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
+
 import ru.truba.touchgallery.TouchView.TouchImageView;
 
 /**
  This class implements method to help <b>TouchImageView</b> fling, draggin and scaling.
  */
 public class GalleryViewPager extends ViewPager {
+
     PointF last;
     public TouchImageView mCurrentView;
+
+    /**
+     * @Fabio add OnItemClickListener interface
+     */
+    protected OnItemClickListener mOnItemClickListener;
+
     public GalleryViewPager(Context context) {
         super(context);
     }
@@ -37,8 +48,8 @@ public class GalleryViewPager extends ViewPager {
         super(context, attrs);
     }
 
-    private float[] handleMotionEvent(MotionEvent event)
-    {
+    @TargetApi(Build.VERSION_CODES.ECLAIR)
+    private float[] handleMotionEvent(MotionEvent event) {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 last = new PointF(event.getX(0), event.getY(0));
@@ -53,10 +64,31 @@ public class GalleryViewPager extends ViewPager {
     }
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP)
+
+        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
+            //super.onInterceptTouchEvent(event);
+
+            float endX = event.getX();
+            float endY = event.getY();
+            if(isAClick(startX, endX, startY, endY)) {
+                if(mOnItemClickListener != null) {
+                    mOnItemClickListener.onItemClicked(mCurrentView, getCurrentItem());
+                }
+                //launchFullPhotoActivity(imageUrls);// WE HAVE A CLICK!!
+            } else {
+                super.onTouchEvent(event);
+            }
+        }
+
+        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN) {
+            startX = event.getX();
+            startY = event.getY();
+        }
+
+        /*if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP)
         {
             super.onTouchEvent(event);
-        }
+        }*/
 
         float [] difference = handleMotionEvent(event);
 
@@ -81,12 +113,30 @@ public class GalleryViewPager extends ViewPager {
         return false;
     }
 
+    private float startX;
+    private float startY;
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP)
-        {
-            super.onInterceptTouchEvent(event);
+        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
+            //super.onInterceptTouchEvent(event);
+
+            float endX = event.getX();
+            float endY = event.getY();
+            if(isAClick(startX, endX, startY, endY)) {
+                if(mOnItemClickListener != null) {
+                    mOnItemClickListener.onItemClicked(mCurrentView, getCurrentItem());
+                }
+            } else {
+                super.onInterceptTouchEvent(event);
+            }
         }
+
+        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN) {
+            startX = event.getX();
+            startY = event.getY();
+        }
+
 
         float [] difference = handleMotionEvent(event);
 
@@ -109,4 +159,20 @@ public class GalleryViewPager extends ViewPager {
         }
         return false;
     }
-}
+
+    private boolean isAClick(float startX, float endX, float startY, float endY) {
+        float differenceX = Math.abs(startX - endX);
+        float differenceY = Math.abs(startY - endY);
+        if (differenceX > CLICK_ACTION_THRESHHOLD/* =5 */ || differenceY > CLICK_ACTION_THRESHHOLD) {
+            return false;
+        }
+        return true;
+    }
+
+    public static interface OnItemClickListener {
+        public void onItemClicked(View view, int position);
+    }
+
+    private final static int CLICK_ACTION_THRESHHOLD = 5;
+    public void setOnItemClickListener(OnItemClickListener listener) { mOnItemClickListener = listener; }
+};
