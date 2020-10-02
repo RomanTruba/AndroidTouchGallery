@@ -1,18 +1,17 @@
-Attention please!
-===================
-This library is not supported anymore. Please, check out nice living forks!
-Thanks for attention.
+<h1>Attention please!</h1>
 
+<h2><b>This library is not supported anymore. Please, check out nice living forks!</b></h2>
+<p>Thanks for attention.<p>
+<hr>
 
-AndroidTouchGallery
-===================
-
+<h2>AndroidTouchGallery</h2>
+<hr>
 Android widget for gallery, using viewpager. Allow pinch zoom and drag for images by url.
 Widget allows use it in Android > 2.0!
 
 
-How to use
-===================
+<h2>How to use</h2>
+<hr>
 1. Make import library folder into your IDE.
 2. Make sure, that AndroidTouchGallery has included in your project as library. Check project properties, and make sure checkbox "Is library" is checked.
 3. Include GalleryViewPager in your layout xml or programmatically.
@@ -46,8 +45,8 @@ mViewPager.setAdapter(pagerAdapter);
 
 5. You can always check example if you miss something.
 
-License
-===================
+<h2>License</h2>
+<hr>
 Copyright (c) 2012-2013 Roman Truba
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
